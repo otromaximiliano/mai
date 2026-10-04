@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "convert": "node scripts/convert-to-webp.mjs",
+    "upload:images": "node scripts/upload-to-blob.mjs",
     "seed": "node scripts/seed-catalog.mjs"
   },
   "dependencies": {

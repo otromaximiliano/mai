@@ -67,13 +67,13 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
                   setPin(e.target.value);
                   setError(false);
                 }}
-                placeholder="PIN (por defecto: 1234)"
+                placeholder="5374"
                 className="w-full text-center tracking-widest text-lg font-bold py-3 px-4 rounded-xl bg-apple-gray border border-black/10 focus:outline-none focus:ring-2 focus:ring-apple-dark/20"
                 autoFocus
               />
               {error && (
                 <p className="text-xs text-rose-600 font-medium mt-2">
-                  PIN incorrecto. Intenta con 1234 o revisa site-config.ts
+                  PIN incorrecto.
                 </p>
               )}
             </div>

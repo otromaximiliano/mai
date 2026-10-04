@@ -44,33 +44,25 @@ export function ProductCard({ product, onSelect, onAddToCart }: ProductCardProps
       onClick={() => onSelect(product)}
       className="group relative flex flex-col justify-between bg-apple-gray/60 hover:bg-apple-gray rounded-3xl p-5 border border-black/5 hover:border-black/10 transition-all duration-300 cursor-pointer hover:shadow-apple-card"
     >
-      {/* Top Badges */}
-      <div className="flex items-center justify-between gap-2 mb-3">
+      {/* Top Details (Brand or Presentation if exists) */}
+      <div className="flex items-center justify-between gap-1 mb-2">
         {product.brand ? (
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-apple-muted">
+          <span className="text-[11px] font-medium uppercase tracking-wider text-apple-muted truncate">
             {product.brand}
           </span>
         ) : (
           <span />
         )}
 
-        <div className="flex items-center gap-1.5">
-          {product.featured && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-200">
-              Especial
-            </span>
-          )}
-
-          {isOutOfStock ? (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-100 text-rose-800">
-              Agotado
-            </span>
-          ) : product.presentation ? (
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-white text-apple-dark border border-black/5 shadow-2xs">
-              {product.presentation}
-            </span>
-          ) : null}
-        </div>
+        {isOutOfStock ? (
+          <span className="text-[10px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">
+            Agotado
+          </span>
+        ) : product.presentation ? (
+          <span className="text-[11px] text-apple-muted font-normal">
+            {product.presentation}
+          </span>
+        ) : null}
       </div>
 
       {/* Image Showcase */}

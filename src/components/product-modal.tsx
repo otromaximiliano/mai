@@ -125,18 +125,14 @@ export function ProductModal({ product, onClose, onAddToCart }: ProductModalProp
                 </p>
               )}
 
-              {/* Stock Status */}
-              <div className="mb-6">
-                {isOutOfStock ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+              {/* Stock Status only when unavailable */}
+              {isOutOfStock && (
+                <div className="mb-4">
+                  <span className="inline-block text-xs font-semibold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md">
                     Temporalmente agotado
                   </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    Disponible en stock
-                  </span>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Quantity and Actions */}
