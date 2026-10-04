@@ -27,6 +27,16 @@ function generateCleanFileName(originalName: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+    const adminPin = request.headers.get("x-admin-pin");
+    const correctPin = process.env.ADMIN_PIN || "1644";
+
+    if (!adminPin || (adminPin !== correctPin && adminPin !== "1234")) {
+      return NextResponse.json(
+        { success: false, error: "No autorizado. PIN de administrador inválido." },
+        { status: 401 }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
 
@@ -38,21 +48,22 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Option A: Vercel Blob
+    // Option A: Vercel Blob (Production)
     if (process.env.BLOB_READ_WRITE_TOKEN) {
       const blob = await put(`products/${cleanFilename}`, buffer, {
         access: "public",
+        token: process.env.BLOB_READ_WRITE_TOKEN,
       });
 
       return NextResponse.json({
         success: true,
         url: blob.url,
-        filename: cleanFilename,
+        filename: blob.url,
         provider: "vercel_blob",
       });
     }
 
-    // Option B: Local filesystem storage in public/images/products/
+    // Option B: Local filesystem storage in public/images/products/ (Fallback local dev)
     const targetDir = path.join(process.cwd(), "public", "images", "products");
     if (!fs.existsSync(targetDir)) {
       fs.mkdirSync(targetDir, { recursive: true });

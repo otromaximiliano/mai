@@ -6,6 +6,8 @@ import { Product } from "@/types/product-types";
 import { siteConfig } from "@/config/site-config";
 import { X, Upload, Loader2, Check, AlertCircle } from "lucide-react";
 
+import { convertImageToWebp } from "@/utils/convert-image-to-webp";
+
 interface AdminProductModalProps {
   product: Product | null;
   isOpen: boolean;
@@ -71,30 +73,38 @@ export function AdminProductModal({
   if (!isOpen) return null;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
 
     setIsUploading(true);
     setErrorMsg("");
 
     try {
+      // 1. Optimizar y convertir imagen a WebP en el navegador (cliente)
+      const webpFile = await convertImageToWebp(rawFile, 800, 0.85);
+
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", webpFile);
+
+      const adminPin = sessionStorage.getItem("naminami_admin_pin") || siteConfig.admin.defaultPin || "1644";
 
       const res = await fetch("/api/admin/upload", {
         method: "POST",
+        headers: {
+          "x-admin-pin": adminPin,
+        },
         body: formData,
       });
 
       const data = await res.json();
       if (data.success) {
-        setImageFilename(data.filename || data.url);
+        setImageFilename(data.url || data.filename);
       } else {
         setErrorMsg(data.error || "Error al subir la imagen");
       }
     } catch (err) {
       console.error("Upload failed:", err);
-      setErrorMsg("Error de conexión al subir la imagen");
+      setErrorMsg("Error al procesar o subir la imagen");
     } finally {
       setIsUploading(false);
     }
@@ -132,10 +142,14 @@ export function AdminProductModal({
 
       const url = isEditing ? `/api/products/${product?.id}` : "/api/products";
       const method = isEditing ? "PUT" : "POST";
+      const adminPin = sessionStorage.getItem("naminami_admin_pin") || siteConfig.admin.defaultPin || "1644";
 
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-pin": adminPin,
+        },
         body: JSON.stringify(payload),
       });
 

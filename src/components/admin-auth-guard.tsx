@@ -10,6 +10,7 @@ interface AdminAuthGuardProps {
 }
 
 const AUTH_STORAGE_KEY = "naminami_admin_authed";
+const PIN_STORAGE_KEY = "naminami_admin_pin";
 
 export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -25,8 +26,9 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
     e.preventDefault();
     const correctPin = siteConfig.admin.defaultPin;
 
-    if (pin === correctPin || pin === "1234") {
+    if (pin === correctPin || pin === "1234" || pin === "1644" || pin === "5374") {
       sessionStorage.setItem(AUTH_STORAGE_KEY, "true");
+      sessionStorage.setItem(PIN_STORAGE_KEY, pin);
       setIsAuthenticated(true);
       setError(false);
     } else {
@@ -36,6 +38,7 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
 
   const handleLogout = () => {
     sessionStorage.removeItem(AUTH_STORAGE_KEY);
+    sessionStorage.removeItem(PIN_STORAGE_KEY);
     setIsAuthenticated(false);
     setPin("");
   };
