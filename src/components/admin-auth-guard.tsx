@@ -54,7 +54,7 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
 
           <h2 className="text-xl font-bold text-apple-dark mb-1">Panel de Control</h2>
           <p className="text-xs text-apple-muted mb-6">
-            Ingresa el PIN de seguridad configurado en <code className="text-apple-dark font-semibold">site-config.ts</code>
+            Ingresa tu PIN de seguridad para continuar
           </p>
 
           <form onSubmit={handleUnlock} className="space-y-4">

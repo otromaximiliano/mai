@@ -44,15 +44,15 @@ export const siteConfig: SiteConfiguration = {
     tagline: "El sabor de lo auténtico.",
     description:
       "Catálogo exclusivo de yerbas selectas, mates artesanales, latas de colección, vinos argentinos y delicias tradicionales.",
-    domain: "ñamiñami.southopenlabs.com",
+    domain: "naminami.southopenlabs.com",
     instagramUrl: "https://instagram.com/",
   },
   whatsapp: {
     phoneNumber: "595981000000",
     displayPhoneNumber: "+595 981 000 000",
     welcomeMessage: "¡Hola! Estoy visitando la tienda Ñami Ñami y quisiera consultar sobre sus productos.",
-    orderPrefixMessage: "🛒 *Hola Ñami Ñami, quiero realizar el siguiente pedido:* \n\n",
-    orderFooterMessage: "\n📍 *¿Tienen disponibilidad y cómo coordinamos el pago y la entrega?*",
+    orderPrefixMessage: "*Hola Ñami Ñami, quiero realizar el siguiente pedido:* \n\n",
+    orderFooterMessage: "\n*¿Tienen disponibilidad y cómo coordinamos el pago y la entrega?*",
   },
   currency: {
     symbol: "Gs.",

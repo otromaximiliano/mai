@@ -38,6 +38,10 @@ async function runSeed() {
 
   const collection = mongoose.connection.collection(collectionName);
 
+  // Mantener exactamente los productos del catálogo inicial
+  const validIds = rawProducts.map((p) => p.id);
+  await collection.deleteMany({ id: { $nin: validIds } });
+
   let upsertedCount = 0;
   for (const item of rawProducts) {
     await collection.updateOne(
