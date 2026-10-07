@@ -43,7 +43,8 @@ export default function AdminPage() {
   const fetchOrders = async () => {
     try {
       const adminPin = sessionStorage.getItem("naminami_admin_pin") || "";
-      const res = await fetch("/api/orders", {
+      const res = await fetch(`/api/orders?t=${Date.now()}`, {
+        cache: "no-store",
         headers: {
           "x-admin-pin": adminPin,
         },
@@ -65,6 +66,21 @@ export default function AdminPage() {
 
   useEffect(() => {
     reloadData();
+  }, []);
+
+  // Recargar órdenes automáticamente cada vez que el admin hace clic en la pestaña "Compras WhatsApp"
+  useEffect(() => {
+    if (activeTab === "orders") {
+      fetchOrders();
+    }
+  }, [activeTab]);
+
+  // Polling suave en segundo plano cada 15 segundos para recibir nuevos pedidos en vivo
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleOpenNew = () => {

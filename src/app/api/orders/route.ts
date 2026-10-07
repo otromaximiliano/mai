@@ -64,6 +64,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     const adminPin = request.headers.get("x-admin-pin");
@@ -78,21 +80,35 @@ export async function GET(request: NextRequest) {
 
     const conn = await connectToDatabase();
     if (!conn) {
-      return NextResponse.json({
-        success: true,
-        count: 0,
-        data: [],
-      });
+      return NextResponse.json(
+        {
+          success: true,
+          count: 0,
+          data: [],
+        },
+        {
+          headers: {
+            "Cache-Control": "no-store, max-age=0",
+          },
+        }
+      );
     }
 
     const OrderModel = getOrderModel();
     const orders = await OrderModel.find().sort({ created_at: -1 }).limit(200).lean();
 
-    return NextResponse.json({
-      success: true,
-      count: orders.length,
-      data: orders,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        count: orders.length,
+        data: orders,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error in GET /api/orders:", error);
     return NextResponse.json(
