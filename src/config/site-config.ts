@@ -32,7 +32,6 @@ export interface SiteConfiguration {
     deliveryInfo: string;
   };
   admin: {
-    defaultPin: string;
     collectionPrefix: string;
   };
   categories: CategoryItem[];
@@ -67,7 +66,6 @@ export const siteConfig: SiteConfiguration = {
     deliveryInfo: "Envíos a todo el país o retiro coordinado por WhatsApp.",
   },
   admin: {
-    defaultPin: "1234",
     collectionPrefix: "naminami_",
   },
   categories: [

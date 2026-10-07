@@ -142,13 +142,13 @@ export function CartDrawer({
                     key={product.id}
                     className="flex gap-4 p-3 rounded-2xl bg-apple-gray/50 border border-black/5 items-center justify-between"
                   >
-                    <div className="relative w-16 h-16 rounded-xl bg-white p-2 shrink-0 border border-black/5 overflow-hidden">
+                    <div className="relative w-16 h-16 rounded-xl bg-white shrink-0 border border-black/5 overflow-hidden">
                       <Image
                         src={imageUrl}
                         alt={product.name}
                         fill
                         sizes="64px"
-                        className="object-contain p-1"
+                        className="object-contain"
                       />
                     </div>
 

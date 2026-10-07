@@ -86,7 +86,7 @@ export function AdminProductModal({
       const formData = new FormData();
       formData.append("file", webpFile);
 
-      const adminPin = sessionStorage.getItem("naminami_admin_pin") || siteConfig.admin.defaultPin || "1644";
+      const adminPin = sessionStorage.getItem("naminami_admin_pin") || "";
 
       const res = await fetch("/api/admin/upload", {
         method: "POST",
@@ -142,7 +142,7 @@ export function AdminProductModal({
 
       const url = isEditing ? `/api/products/${product?.id}` : "/api/products";
       const method = isEditing ? "PUT" : "POST";
-      const adminPin = sessionStorage.getItem("naminami_admin_pin") || siteConfig.admin.defaultPin || "1644";
+      const adminPin = sessionStorage.getItem("naminami_admin_pin") || "";
 
       const res = await fetch(url, {
         method,

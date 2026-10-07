@@ -66,14 +66,14 @@ export function ProductCard({ product, onSelect, onAddToCart }: ProductCardProps
       </div>
 
       {/* Image Showcase */}
-      <div className="relative aspect-square w-full my-3 flex items-center justify-center overflow-hidden rounded-2xl bg-white/40 p-4 group-hover:bg-white/70 transition-colors">
+      <div className="relative aspect-square w-full my-3 flex items-center justify-center overflow-hidden rounded-2xl bg-white/40 group-hover:bg-white/70 transition-colors">
         <Image
           src={imageUrl}
           alt={product.name}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className={cn(
-            "object-contain p-2 transition-transform duration-500 group-hover:scale-105",
+            "object-contain transition-transform duration-500 group-hover:scale-105",
             isOutOfStock && "opacity-40 grayscale"
           )}
         />

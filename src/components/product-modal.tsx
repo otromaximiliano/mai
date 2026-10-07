@@ -74,13 +74,13 @@ export function ProductModal({ product, onClose, onAddToCart }: ProductModalProp
         <div className="overflow-y-auto pr-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 items-center">
             {/* Image Showcase */}
-            <div className="relative aspect-square w-full rounded-2xl bg-apple-gray/70 p-4 sm:p-6 flex items-center justify-center border border-black/5">
+            <div className="relative aspect-square w-full rounded-2xl bg-apple-gray/70 overflow-hidden flex items-center justify-center border border-black/5">
               <Image
                 src={imageUrl}
                 alt={product.name}
                 fill
                 sizes="(max-width: 640px) 100vw, 50vw"
-                className={`object-contain p-3 sm:p-4 transition-all ${
+                className={`object-contain transition-all ${
                   isOutOfStock ? "opacity-40 grayscale" : ""
                 }`}
               />
