@@ -6,13 +6,24 @@ export async function POST(request: NextRequest) {
     const { email, password } = body;
 
     const correctEmail = "mai@southopenlabs.com";
-    const correctPassword = process.env.ADMIN_PIN || "1644";
+    const correctPassword = process.env.ADMIN_PIN;
+
+    if (!correctPassword) {
+      console.error("ADMIN_PIN no está configurada en las variables de entorno");
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Variable de entorno ADMIN_PIN no configurada en el servidor.",
+        },
+        { status: 500 }
+      );
+    }
 
     if (
       email &&
       email.toLowerCase().trim() === correctEmail &&
       password &&
-      (password === correctPassword || password === "1234")
+      password === correctPassword
     ) {
       return NextResponse.json({
         success: true,

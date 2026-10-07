@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
       customer_name: customer_name || "",
       customer_note: customer_note || "",
       items: items.map((i: any) => ({
-        product_id: i.product_id || i.product?.id,
-        name: i.name || i.product?.name,
+        product_id: i.product_id || i.product?.id || "",
+        name: i.name || i.product?.name || "",
         presentation: i.presentation || i.product?.presentation || "",
         price: Number(i.price || i.product?.price || 0),
         quantity: Number(i.quantity || 1),
@@ -37,32 +37,39 @@ export async function POST(request: NextRequest) {
     };
 
     const conn = await connectToDatabase();
-    if (conn) {
-      const OrderModel = getOrderModel();
-      await OrderModel.create(orderData);
+    if (!conn) {
+      console.warn("MongoDB no conectado (MONGODB_URI ausente). No se persistió la orden.");
+      return NextResponse.json({
+        success: true,
+        order_code: orderCode,
+        data: orderData,
+        warning: "MongoDB no conectado",
+      });
     }
+
+    const OrderModel = getOrderModel();
+    const createdDoc = await OrderModel.create(orderData);
 
     return NextResponse.json({
       success: true,
       order_code: orderCode,
-      data: orderData,
+      data: createdDoc.toObject ? createdDoc.toObject() : orderData,
     });
   } catch (error) {
     console.error("Error in POST /api/orders:", error);
     return NextResponse.json({
-      success: true,
-      order_code: generateOrderCode(),
-      warning: "Registrado localmente",
-    });
+      success: false,
+      error: error instanceof Error ? error.message : "Error al registrar la compra",
+    }, { status: 500 });
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
     const adminPin = request.headers.get("x-admin-pin");
-    const correctPin = process.env.ADMIN_PIN || "1644";
+    const correctPin = process.env.ADMIN_PIN;
 
-    if (!adminPin || (adminPin !== correctPin && adminPin !== "1234")) {
+    if (!correctPin || !adminPin || adminPin !== correctPin) {
       return NextResponse.json(
         { success: false, error: "No autorizado." },
         { status: 401 }

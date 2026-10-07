@@ -42,7 +42,7 @@ export default function AdminPage() {
 
   const fetchOrders = async () => {
     try {
-      const adminPin = sessionStorage.getItem("naminami_admin_pin") || "1644";
+      const adminPin = sessionStorage.getItem("naminami_admin_pin") || "";
       const res = await fetch("/api/orders", {
         headers: {
           "x-admin-pin": adminPin,

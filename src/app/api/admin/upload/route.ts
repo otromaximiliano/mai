@@ -28,9 +28,9 @@ function generateCleanFileName(originalName: string): string {
 export async function POST(request: NextRequest) {
   try {
     const adminPin = request.headers.get("x-admin-pin");
-    const correctPin = process.env.ADMIN_PIN || "1644";
+    const correctPin = process.env.ADMIN_PIN;
 
-    if (!adminPin || (adminPin !== correctPin && adminPin !== "1234")) {
+    if (!correctPin || !adminPin || adminPin !== correctPin) {
       return NextResponse.json(
         { success: false, error: "No autorizado. PIN de administrador inválido." },
         { status: 401 }
