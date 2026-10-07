@@ -48,8 +48,8 @@ export const siteConfig: SiteConfiguration = {
     instagramUrl: "https://instagram.com/",
   },
   whatsapp: {
-    phoneNumber: "595981000000",
-    displayPhoneNumber: "+595 981 000 000",
+    phoneNumber: "595985623486",
+    displayPhoneNumber: "+595 985 623 486",
     welcomeMessage: "¡Hola! Estoy visitando la tienda Ñami Ñami y quisiera consultar sobre sus productos.",
     orderPrefixMessage: "*Hola Ñami Ñami, quiero realizar el siguiente pedido:* \n\n",
     orderFooterMessage: "\n*¿Tienen disponibilidad y cómo coordinamos el pago y la entrega?*",

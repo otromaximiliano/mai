@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/config/site-config";
 import { ShoppingBag, Search, MessageCircle, SlidersHorizontal } from "lucide-react";
@@ -26,16 +27,19 @@ export function SiteHeader({
   )}`;
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/80 border-b border-black/5 transition-all">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/90 border-b border-black/10 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Logo / Brand */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-full bg-apple-dark text-white flex items-center justify-center font-bold text-sm tracking-tighter group-hover:scale-105 transition-transform">
-            Ñ
+          <div className="relative h-9 w-28 sm:h-10 sm:w-32 flex items-center group-hover:opacity-90 transition-opacity">
+            <Image
+              src="/logo.svg"
+              alt={siteConfig.brand.name}
+              fill
+              priority
+              className="object-contain object-left"
+            />
           </div>
-          <span className="font-semibold text-lg sm:text-xl text-apple-dark tracking-tight">
-            {siteConfig.brand.name}
-          </span>
         </Link>
 
         {/* Search Bar (Desktop) */}

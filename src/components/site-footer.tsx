@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/config/site-config";
 import { MessageCircle, Clock, MapPin, Truck, ShieldCheck } from "lucide-react";
@@ -13,11 +14,13 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Brand Column */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-apple-dark text-white flex items-center justify-center font-bold text-xs">
-                Ñ
-              </div>
-              <span className="font-bold text-lg tracking-tight">{siteConfig.brand.name}</span>
+            <div className="relative h-8 w-28">
+              <Image
+                src="/logo.svg"
+                alt={siteConfig.brand.name}
+                fill
+                className="object-contain object-left"
+              />
             </div>
             <p className="text-xs text-apple-muted leading-relaxed">
               {siteConfig.brand.description}
