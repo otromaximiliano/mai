@@ -3,20 +3,32 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Product } from "@/types/product-types";
+import { OrderRecord } from "@/types/order-types";
 import { siteConfig } from "@/config/site-config";
 import { AdminAuthGuard } from "@/components/admin-auth-guard";
 import { AdminProductTable } from "@/components/admin-product-table";
 import { AdminProductModal } from "@/components/admin-product-modal";
-import { ArrowLeft, Plus, Package, CheckCircle2, AlertTriangle, RefreshCw } from "lucide-react";
+import { AdminOrdersTable } from "@/components/admin-orders-table";
+import {
+  ArrowLeft,
+  Plus,
+  Package,
+  CheckCircle2,
+  AlertTriangle,
+  RefreshCw,
+  ShoppingBag,
+  DollarSign,
+} from "lucide-react";
 
 export default function AdminPage() {
+  const [activeTab, setActiveTab] = useState<"products" | "orders">("products");
   const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const fetchProducts = async () => {
-    setIsLoading(true);
     try {
       const res = await fetch("/api/products");
       const data = await res.json();
@@ -25,13 +37,34 @@ export default function AdminPage() {
       }
     } catch (err) {
       console.error("Error loading products for admin:", err);
-    } finally {
-      setIsLoading(false);
     }
   };
 
+  const fetchOrders = async () => {
+    try {
+      const adminPin = sessionStorage.getItem("naminami_admin_pin") || "1644";
+      const res = await fetch("/api/orders", {
+        headers: {
+          "x-admin-pin": adminPin,
+        },
+      });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setOrders(data.data);
+      }
+    } catch (err) {
+      console.error("Error loading orders for admin:", err);
+    }
+  };
+
+  const reloadData = async () => {
+    setIsLoading(true);
+    await Promise.all([fetchProducts(), fetchOrders()]);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    fetchProducts();
+    reloadData();
   }, []);
 
   const handleOpenNew = () => {
@@ -77,6 +110,7 @@ export default function AdminPage() {
 
   const inStockCount = products.filter((p) => p.stock !== false).length;
   const outOfStockCount = products.length - inStockCount;
+  const totalOrdersSum = orders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
 
   return (
     <AdminAuthGuard>
@@ -94,76 +128,139 @@ export default function AdminPage() {
               </Link>
               <div>
                 <h1 className="font-bold text-base sm:text-lg leading-tight">
-                  Panel de Productos • {siteConfig.brand.name}
+                  Panel de Administración • {siteConfig.brand.name}
                 </h1>
                 <span className="text-[11px] text-apple-muted">
-                  Gestiona precios, inventario y catálogo en tiempo real
+                  Gestión integral de catálogo y compras enviadas a WhatsApp
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
               <button
-                onClick={fetchProducts}
+                onClick={reloadData}
                 title="Actualizar datos"
                 className="p-2 rounded-full hover:bg-apple-gray text-apple-muted hover:text-apple-dark transition-colors"
               >
                 <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
               </button>
 
-              <button
-                onClick={handleOpenNew}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-apple-dark hover:bg-black text-white text-xs font-semibold shadow-sm active:scale-95 transition-all"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Nuevo Producto</span>
-              </button>
+              {activeTab === "products" && (
+                <button
+                  onClick={handleOpenNew}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-apple-dark hover:bg-black text-white text-xs font-semibold shadow-sm active:scale-95 transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Nuevo Producto</span>
+                </button>
+              )}
             </div>
           </div>
         </header>
 
         {/* Content */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-          {/* Quick Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white p-4 rounded-2xl border border-black/5 flex items-center gap-4 shadow-2xs">
-              <div className="w-10 h-10 rounded-xl bg-apple-gray flex items-center justify-center text-apple-dark">
-                <Package className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-xs text-apple-muted block">Total de Productos</span>
-                <span className="text-xl font-bold text-apple-dark">{products.length}</span>
-              </div>
-            </div>
+          {/* Navigation Tabs */}
+          <div className="flex items-center gap-2 border-b border-black/10 pb-4">
+            <button
+              onClick={() => setActiveTab("products")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
+                activeTab === "products"
+                  ? "bg-apple-dark text-white shadow-sm"
+                  : "bg-white text-apple-muted hover:text-apple-dark border border-black/5"
+              }`}
+            >
+              <Package className="w-4 h-4" />
+              <span>Productos ({products.length})</span>
+            </button>
 
-            <div className="bg-white p-4 rounded-2xl border border-black/5 flex items-center gap-4 shadow-2xs">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-                <CheckCircle2 className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-xs text-apple-muted block">Disponibles en Stock</span>
-                <span className="text-xl font-bold text-emerald-700">{inStockCount}</span>
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-2xl border border-black/5 flex items-center gap-4 shadow-2xs">
-              <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
-                <AlertTriangle className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-xs text-apple-muted block">Agotados / Pausados</span>
-                <span className="text-xl font-bold text-rose-700">{outOfStockCount}</span>
-              </div>
-            </div>
+            <button
+              onClick={() => setActiveTab("orders")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
+                activeTab === "orders"
+                  ? "bg-apple-dark text-white shadow-sm"
+                  : "bg-white text-apple-muted hover:text-apple-dark border border-black/5"
+              }`}
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span>Compras WhatsApp ({orders.length})</span>
+            </button>
           </div>
 
-          {/* Table */}
-          <AdminProductTable
-            products={products}
-            onEdit={handleOpenEdit}
-            onDelete={handleDeleteProduct}
-            onUpdateProduct={handleProductUpdated}
-          />
+          {activeTab === "products" ? (
+            <>
+              {/* Quick Metrics Products */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-black/5 flex items-center gap-4 shadow-2xs">
+                  <div className="w-10 h-10 rounded-xl bg-apple-gray flex items-center justify-center text-apple-dark">
+                    <Package className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs text-apple-muted block">Total de Productos</span>
+                    <span className="text-xl font-bold text-apple-dark">{products.length}</span>
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-2xl border border-black/5 flex items-center gap-4 shadow-2xs">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs text-apple-muted block">Disponibles en Stock</span>
+                    <span className="text-xl font-bold text-emerald-700">{inStockCount}</span>
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-2xl border border-black/5 flex items-center gap-4 shadow-2xs">
+                  <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
+                    <AlertTriangle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs text-apple-muted block">Agotados / Pausados</span>
+                    <span className="text-xl font-bold text-rose-700">{outOfStockCount}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Table Products */}
+              <AdminProductTable
+                products={products}
+                onEdit={handleOpenEdit}
+                onDelete={handleDeleteProduct}
+                onUpdateProduct={handleProductUpdated}
+              />
+            </>
+          ) : (
+            <>
+              {/* Quick Metrics Orders */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-black/5 flex items-center gap-4 shadow-2xs">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                    <ShoppingBag className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs text-apple-muted block">Total de Pedidos Enviados</span>
+                    <span className="text-xl font-bold text-apple-dark">{orders.length}</span>
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-2xl border border-black/5 flex items-center gap-4 shadow-2xs">
+                  <div className="w-10 h-10 rounded-xl bg-apple-gray flex items-center justify-center text-apple-dark">
+                    <DollarSign className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs text-apple-muted block">Monto Total Acumulado</span>
+                    <span className="text-xl font-bold text-apple-dark font-mono">
+                      {totalOrdersSum.toLocaleString("es-PY")} Gs.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Table Orders */}
+              <AdminOrdersTable orders={orders} />
+            </>
+          )}
         </main>
 
         {/* Create / Edit Modal */}

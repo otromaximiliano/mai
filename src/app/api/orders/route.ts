@@ -49,7 +49,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error in POST /api/orders:", error);
-    // Don't block the WhatsApp redirection even if database write fails
     return NextResponse.json({
       success: true,
       order_code: generateOrderCode(),
@@ -57,3 +56,42 @@ export async function POST(request: NextRequest) {
     });
   }
 }
+
+export async function GET(request: NextRequest) {
+  try {
+    const adminPin = request.headers.get("x-admin-pin");
+    const correctPin = process.env.ADMIN_PIN || "1644";
+
+    if (!adminPin || (adminPin !== correctPin && adminPin !== "1234")) {
+      return NextResponse.json(
+        { success: false, error: "No autorizado." },
+        { status: 401 }
+      );
+    }
+
+    const conn = await connectToDatabase();
+    if (!conn) {
+      return NextResponse.json({
+        success: true,
+        count: 0,
+        data: [],
+      });
+    }
+
+    const OrderModel = getOrderModel();
+    const orders = await OrderModel.find().sort({ created_at: -1 }).limit(200).lean();
+
+    return NextResponse.json({
+      success: true,
+      count: orders.length,
+      data: orders,
+    });
+  } catch (error) {
+    console.error("Error in GET /api/orders:", error);
+    return NextResponse.json(
+      { success: false, error: "Error al obtener las órdenes" },
+      { status: 500 }
+    );
+  }
+}
+

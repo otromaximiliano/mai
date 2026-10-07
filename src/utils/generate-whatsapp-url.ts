@@ -21,7 +21,7 @@ function calculateOrderTotal(items: OrderItemForWhatsApp[]): number {
 function formatSingleItemLine(item: OrderItemForWhatsApp): string {
   const lineTotal = item.price * item.quantity;
   const presentationInfo = item.presentation ? ` (${item.presentation})` : "";
-  return `• *${item.quantity}x* ${item.name}${presentationInfo} — ${formatCurrency(lineTotal)}`;
+  return `- *${item.quantity}x* ${item.name}${presentationInfo} — ${formatCurrency(lineTotal)}`;
 }
 
 function buildOrderMessage(details: WhatsAppOrderDetails): string {
@@ -31,14 +31,14 @@ function buildOrderMessage(details: WhatsAppOrderDetails): string {
 
   let message = `${whatsapp.orderPrefixMessage}`;
   message += `${itemsText}\n\n`;
-  message += `💰 *Total Estimado:* ${formatCurrency(grandTotal)}\n`;
+  message += `*Total Estimado:* ${formatCurrency(grandTotal)}\n`;
 
   if (details.customerName && details.customerName.trim().length > 0) {
-    message += `👤 *Cliente:* ${details.customerName.trim()}\n`;
+    message += `*Cliente:* ${details.customerName.trim()}\n`;
   }
 
   if (details.customerNote && details.customerNote.trim().length > 0) {
-    message += `📝 *Nota / Dirección:* ${details.customerNote.trim()}\n`;
+    message += `*Nota / Dirección:* ${details.customerNote.trim()}\n`;
   }
 
   message += whatsapp.orderFooterMessage;

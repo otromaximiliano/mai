@@ -50,7 +50,7 @@ export const siteConfig: SiteConfiguration = {
   whatsapp: {
     phoneNumber: "595985623486",
     displayPhoneNumber: "+595 985 623 486",
-    welcomeMessage: "¡Hola! Estoy visitando la tienda Ñami Ñami y quisiera consultar sobre sus productos.",
+    welcomeMessage: "Hola. Estoy visitando la tienda Ñami Ñami y quisiera consultar sobre sus productos.",
     orderPrefixMessage: "*Hola Ñami Ñami, quiero realizar el siguiente pedido:* \n\n",
     orderFooterMessage: "\n*¿Tienen disponibilidad y cómo coordinamos el pago y la entrega?*",
   },

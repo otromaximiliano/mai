@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { siteConfig } from "@/config/site-config";
-import { Lock, ArrowRight, Store } from "lucide-react";
+import { Lock, ArrowRight, Store, Mail, KeyRound } from "lucide-react";
 import Link from "next/link";
 
 interface AdminAuthGuardProps {
@@ -11,36 +10,56 @@ interface AdminAuthGuardProps {
 
 const AUTH_STORAGE_KEY = "naminami_admin_authed";
 const PIN_STORAGE_KEY = "naminami_admin_pin";
+const EMAIL_STORAGE_KEY = "naminami_admin_email";
 
 export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [pin, setPin] = useState("");
-  const [error, setError] = useState(false);
+  const [email, setEmail] = useState("mai@southopenlabs.com");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const authed = sessionStorage.getItem(AUTH_STORAGE_KEY) === "true";
     setIsAuthenticated(authed);
   }, []);
 
-  const handleUnlock = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const correctPin = siteConfig.admin.defaultPin;
+    setIsLoading(true);
+    setErrorMessage(null);
 
-    if (pin === correctPin || pin === "1234" || pin === "1644" || pin === "5374") {
-      sessionStorage.setItem(AUTH_STORAGE_KEY, "true");
-      sessionStorage.setItem(PIN_STORAGE_KEY, pin);
-      setIsAuthenticated(true);
-      setError(false);
-    } else {
-      setError(true);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        sessionStorage.setItem(AUTH_STORAGE_KEY, "true");
+        sessionStorage.setItem(PIN_STORAGE_KEY, password);
+        sessionStorage.setItem(EMAIL_STORAGE_KEY, email);
+        setIsAuthenticated(true);
+      } else {
+        setErrorMessage(data.error || "Credenciales incorrectas");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setErrorMessage("Error de conexión al verificar credenciales");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleLogout = () => {
     sessionStorage.removeItem(AUTH_STORAGE_KEY);
     sessionStorage.removeItem(PIN_STORAGE_KEY);
+    sessionStorage.removeItem(EMAIL_STORAGE_KEY);
     setIsAuthenticated(false);
-    setPin("");
+    setPassword("");
   };
 
   if (isAuthenticated === null) {
@@ -55,37 +74,65 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
             <Lock className="w-5 h-5" />
           </div>
 
-          <h2 className="text-xl font-bold text-apple-dark mb-1">Panel de Control</h2>
+          <h2 className="text-xl font-bold text-apple-dark mb-1">Acceso Administrativo</h2>
           <p className="text-xs text-apple-muted mb-6">
-            Ingresa tu PIN de seguridad para continuar
+            Inicia sesión para gestionar catálogo y pedidos
           </p>
 
-          <form onSubmit={handleUnlock} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4 text-left">
             <div>
-              <input
-                type="password"
-                maxLength={6}
-                value={pin}
-                onChange={(e) => {
-                  setPin(e.target.value);
-                  setError(false);
-                }}
-                placeholder="5374"
-                className="w-full text-center tracking-widest text-lg font-bold py-3 px-4 rounded-xl bg-apple-gray border border-black/10 focus:outline-none focus:ring-2 focus:ring-apple-dark/20"
-                autoFocus
-              />
-              {error && (
-                <p className="text-xs text-rose-600 font-medium mt-2">
-                  PIN incorrecto.
-                </p>
-              )}
+              <label className="text-[11px] font-semibold text-apple-muted block mb-1">
+                Email
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-apple-muted absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setErrorMessage(null);
+                  }}
+                  placeholder="mai@southopenlabs.com"
+                  required
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-apple-gray border border-black/10 text-xs text-apple-dark focus:outline-none focus:ring-2 focus:ring-apple-dark/20"
+                />
+              </div>
             </div>
+
+            <div>
+              <label className="text-[11px] font-semibold text-apple-muted block mb-1">
+                Contraseña
+              </label>
+              <div className="relative">
+                <KeyRound className="w-4 h-4 text-apple-muted absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrorMessage(null);
+                  }}
+                  placeholder="••••••••"
+                  required
+                  autoFocus
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-apple-gray border border-black/10 text-xs text-apple-dark focus:outline-none focus:ring-2 focus:ring-apple-dark/20"
+                />
+              </div>
+            </div>
+
+            {errorMessage && (
+              <p className="text-xs text-rose-600 font-medium text-center">
+                {errorMessage}
+              </p>
+            )}
 
             <button
               type="submit"
-              className="w-full py-3 rounded-full bg-apple-dark hover:bg-black text-white font-medium text-sm flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
+              disabled={isLoading}
+              className="w-full py-3 rounded-full bg-apple-dark hover:bg-black text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm disabled:opacity-50"
             >
-              <span>Acceder</span>
+              <span>{isLoading ? "Verificando..." : "Ingresar"}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
@@ -109,7 +156,7 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
       <div className="bg-apple-dark text-white text-[11px] py-1.5 px-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="font-medium">Modo Administrador Activo</span>
+          <span className="font-medium">Sesión: mai@southopenlabs.com</span>
         </div>
         <button
           onClick={handleLogout}
